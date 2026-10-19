@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NEW YOLK FRONTIER — نيوويوولك لاند</title>
+  <style>
+    :root { --navy:#152333; --teal:#236B60; --gold:#F2BC57; --ivory:#F2E9D8; }
+    html, body { margin:0; height:100%; background:var(--navy); color:var(--ivory); font-family: "Segoe UI", Tahoma, sans-serif; overflow:hidden; }
+    #unity-canvas { position:fixed; inset:0; width:100vw; height:100vh; display:block; background:var(--navy); }
+    #loader { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; background:var(--navy); }
+    #loader h1 { margin:0; font-size:clamp(28px,5vw,56px); color:var(--gold); letter-spacing:1px; }
+    #loader p { margin:0; opacity:.8; font-size:clamp(14px,2vw,20px); }
+    #bar { width:min(520px,80vw); height:10px; background:#0b1520; border:1px solid var(--teal); border-radius:6px; overflow:hidden; direction:ltr; }
+    #fill { width:0; height:100%; background:linear-gradient(90deg,var(--teal),var(--gold)); transition:width .2s; }
+    #note { position:fixed; bottom:10px; left:0; right:0; text-align:center; font-size:12px; opacity:.55; }
+    #err { color:#C84949; max-width:80vw; text-align:center; }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="loader">
+    <h1>NEW YOLK: FRONTIER</h1>
+    <p>نيوويوولك لاند — حُماة الوادي</p>
+    <div id="bar"><div id="fill"></div></div>
+    <p id="pct">جارٍ التحميل…</p>
+    <p id="err"></p>
+  </div>
+  <div id="note">تصوّر غير رسمي للعبة. العملات والأحداث افتراضية ولا توجد شراكة مع New Yolk. أفضل تجربة على Chrome أو Edge بحاسوب مكتبي.</div>
+  <script src="Build/Web.loader.js"></script>
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    function fit() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);   // cap DPR: big win for GPU fill rate on the web tier
+      canvas.width = Math.round(innerWidth * dpr);
+      canvas.height = Math.round(innerHeight * dpr);
+    }
+    addEventListener("resize", fit); fit();
+    createUnityInstance(canvas, {
+      dataUrl: "Build/Web.data.unityweb",
+      frameworkUrl: "Build/Web.framework.js.unityweb",
+      codeUrl: "Build/Web.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "NewYolk Frontier (unofficial)",
+      productName: "NEW YOLK FRONTIER",
+      productVersion: "1.0",
+      matchWebGLToCanvasSize: false,
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
+      autoSyncPersistentDataPath: true,
+    }, (p) => {
+      document.querySelector("#fill").style.width = Math.round(p * 100) + "%";
+      document.querySelector("#pct").textContent = "جارٍ التحميل… " + Math.round(p * 100) + "%";
+    }).then(() => {
+      document.querySelector("#loader").remove();
+      document.querySelector("#note").remove();
+      canvas.focus();
+    }).catch((m) => { document.querySelector("#err").textContent = m; });
+  </script>
+</body>
+</html>
